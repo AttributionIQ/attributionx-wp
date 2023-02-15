@@ -8,3 +8,6 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+require_once "inc/cookie.php";
+require_once "inc/gf-integration.php";
