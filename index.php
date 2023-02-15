@@ -56,6 +56,11 @@
     $attx["referer"] = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
   }
 
+  //Get path
+  if (isset($_SERVER["REQUEST_URI"])) {
+    $attx["path"] = strtok($_SERVER["REQUEST_URI"], '?');
+  }
+
   //Set source
   if (isset($attx["gclid"])) {
     $attx["source"] = "Google Ads";
@@ -68,6 +73,9 @@
   } else if (isset($attx["referer"]) && strpos($attx["referer"], "instagram") !== false) {
     $attx["source"] = "Instagram";
   }
+
+  //Set time
+  $attx["time"] = date("D, d M Y H:i:s T");
 
   //Set cookie
   foreach ($attx as $k => $v) {
