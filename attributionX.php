@@ -5,8 +5,6 @@
  * Version: 1.0.0
  * Author: Tiger Digital
  * Author URI: https://tigerdigital.co.uk
- * Requires at least: 5.9
- * Requires PHP: 7.2
  */
 
 defined( 'ABSPATH' ) || exit;
