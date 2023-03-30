@@ -125,6 +125,7 @@ gulp.task('dist', gulp.series('clean-dist', function () {
             '!./dist/**',
             '!./node_modules/**',
             '!./src/**',
+            '!./tests/**',
             '!./.gitignore',
             '!./gulpfile.js',
             '!./package-lock.json',
