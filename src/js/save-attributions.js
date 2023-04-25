@@ -19,7 +19,6 @@ jQuery(function ($) {
     }
   });
 
-
   /**
    * Exit if we don't have params in the URL.
    */
@@ -28,25 +27,14 @@ jQuery(function ($) {
     return;
   }
 
+  /**
+   * Add default params such as time, path, ref, and source.
+   */
+  data = addDefaultParams(data);
 
-  data.time = (new Date()).toUTCString();
-  data.path = location.pathname;
-  data.ref = encodeURIComponent(document.referrer) || 'direct';
-
-  if (searchParams.has('gclid')) {
-    data.source = 'Google Ads';
-  } else if (searchParams.has('fbclid')) {
-    data.source = 'Meta Ads';
-  } else if (searchParams.has('tduid')) {
-    data.source = 'Tradedoubler';
-  } else {
-    if (data.ref.indexOf('google') !== -1) {
-      data.source = 'Google';
-    } else if (data.ref.indexOf('instagram') !== -1) {
-      data.source = 'Instagram';
-    }
-  }
-
+  /**
+   * Save data to the localStorage.
+   */
   let storage = localStorage.getItem("attx");
 
   if (storage) {
@@ -57,9 +45,10 @@ jQuery(function ($) {
 
   storage.push(data);
 
-  //Save data to the localStorage.
   localStorage.setItem("attx", JSON.stringify(storage));
+
   sessionStorage.setItem("attx_updated", 1);
+  
   $(document).trigger("attx.updated");
 
 })

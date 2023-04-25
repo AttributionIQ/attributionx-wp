@@ -130,6 +130,7 @@ gulp.task('dist', gulp.series('clean-dist', function () {
             '!./gulpfile.js',
             '!./package-lock.json',
             '!./package.json',
+            '!./attributionX.code-workspace',
         ]
     )
         .pipe(gulp.dest('dist'))
