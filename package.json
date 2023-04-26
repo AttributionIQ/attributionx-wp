@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "attributionx",
   "version": "1.0.0",
   "description": "Discover the source of your leads. We make it easy to track the source of every lead, so you can see which campaigns and channels are truly driving results.",
@@ -39,6 +40,7 @@
     "run-sequence": "^2.2.1"
   },
   "devDependencies": {
-    "gulp": "^4.0.2"
+    "gulp": "^4.0.2",
+    "supabase": "^1.50.11"
   }
 }

@@ -89,7 +89,9 @@ gulp.task('styles', gulp.series('sass', 'minify-css'));
 // Uglifies and concat all JS files into one
 gulp.task('scripts', function () {
 
-    return gulp.src(basePaths.dev + 'js/**/*.js')
+    return gulp.src([
+        basePaths.dev + 'js/**/*.js'
+    ])
         .pipe(concat('scripts.min.js'))
         .pipe(uglify().on('error', function (e) {
             console.log(e);
@@ -125,6 +127,7 @@ gulp.task('dist', gulp.series('clean-dist', function () {
             '!./dist/**',
             '!./node_modules/**',
             '!./src/**',
+            '!./supabase/**',
             '!./tests/**',
             '!./.gitignore',
             '!./gulpfile.js',
@@ -133,6 +136,6 @@ gulp.task('dist', gulp.series('clean-dist', function () {
             '!./attributionX.code-workspace',
         ]
     )
-        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest('dist/attributionX'))
 }));
 
