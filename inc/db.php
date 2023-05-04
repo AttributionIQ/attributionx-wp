@@ -19,8 +19,11 @@ function attx_save_to_db()
   //Send request
   $url = 'https://myxznsjxiabywzqxedih.functions.supabase.co/events';
 
+  $incoming_data = $_POST['data'];
+
   $data = array(
-    "attributionData" => $_POST['attributions'],
+    "visitorIds" => $incoming_data["visitorIds"],
+    "attributionData" => $incoming_data["attribution"],
     "host" => $_POST['host'],
     "api_key" => $api_key
   );

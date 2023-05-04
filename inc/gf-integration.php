@@ -6,7 +6,7 @@ function attx_gform_pre_submission_handler($form)
 
    //Get data.
    if (isset($_POST["attx"])) {
-      $storage = json_decode(stripslashes($_POST["attx"]));
+      $storage = json_decode(stripslashes($_POST["attx"]), true);
       $storage = (array) end($storage);
    } else {
       $storage = [];
@@ -15,45 +15,48 @@ function attx_gform_pre_submission_handler($form)
    //Populate fields.
    if (isset($form["fields"]) && is_array($form["fields"])) {
       foreach ($form["fields"] as $field) {
-         if ($field["inputName"] === "utm_id") {
+         if ($field["inputName"] === "visitor_ids") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["utm_id"]) ? $storage["utm_id"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["visitorIds"]) ? json_encode($storage["visitorIds"]) : "";
+         } else if ($field["inputName"] === "utm_id") {
+
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["utm_id"]) ? $storage["attribution"]["utm_id"] : "";
          } else if ($field["inputName"] === "utm_source") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["utm_source"]) ? $storage["utm_source"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["utm_source"]) ? $storage["attribution"]["utm_source"] : "";
          } else if ($field["inputName"] === "utm_medium") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["utm_medium"]) ? $storage["utm_medium"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["utm_medium"]) ? $storage["attribution"]["utm_medium"] : "";
          } else if ($field["inputName"] === "utm_campaign") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["utm_campaign"]) ? $storage["utm_campaign"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["utm_campaign"]) ? $storage["attribution"]["utm_campaign"] : "";
          } else if ($field["inputName"] === "utm_term") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["utm_term"]) ? $storage["utm_term"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["utm_term"]) ? $storage["attribution"]["utm_term"] : "";
          } else if ($field["inputName"] === "utm_content") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["utm_content"]) ? $storage["utm_content"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["utm_content"]) ? $storage["attribution"]["utm_content"] : "";
          } else if ($field["inputName"] === "gclid") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["gclid"]) ? $storage["gclid"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["gclid"]) ? $storage["attribution"]["gclid"] : "";
          } else if ($field["inputName"] === "fbclid") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["fbclid"]) ? $storage["fbclid"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["fbclid"]) ? $storage["attribution"]["fbclid"] : "";
          } else if ($field["inputName"] === "tduid") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["tduid"]) ? $storage["tduid"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["tduid"]) ? $storage["attribution"]["tduid"] : "";
          } else if ($field["inputName"] === "referer") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["ref"]) ? urldecode($storage["ref"]) : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["ref"]) ? urldecode($storage["attribution"]["ref"]) : "";
          } else if ($field["inputName"] === "path") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["path"]) ? $storage["path"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["path"]) ? $storage["attribution"]["path"] : "";
          } else if ($field["inputName"] === "source") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["source"]) ? $storage["source"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["source"]) ? $storage["attribution"]["source"] : "";
          } else if ($field["inputName"] === "time") {
 
-            $_POST['input_' . $field["id"]] =  isset($storage["time"]) ? $storage["time"] : "";
+            $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["time"]) ? $storage["attribution"]["time"] : "";
          }
       }
    }

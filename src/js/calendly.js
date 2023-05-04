@@ -19,7 +19,9 @@ jQuery(function ($) {
         let storage = localStorage.getItem("attx");
         if (storage) {
           storage = JSON.parse(storage);
-          let attributions = storage[storage.length - 1];
+          let lastStoredData = storage[storage.length - 1];
+          let attribution = lastStoredData.attribution;
+          let visitorIds = encodeURIComponent("visitorIds: " + JSON.stringify(lastStoredData.visitorIds));
 
           //Check if we already updated iframe URL 
           //to prevent infinite iframe reloading.
@@ -32,24 +34,24 @@ jQuery(function ($) {
 
           newUrl = oldUrl;
 
-          if (attributions.hasOwnProperty("utm_source")) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_source", attributions.utm_source);
+          if (attribution.hasOwnProperty("utm_source")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_source", attribution.utm_source);
           }
 
-          if (attributions.hasOwnProperty("utm_medium")) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_medium", attributions.utm_medium);
+          if (attribution.hasOwnProperty("utm_medium")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_medium", attribution.utm_medium);
           }
 
-          if (attributions.hasOwnProperty("utm_campaign")) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_campaign", attributions.utm_campaign);
+          if (attribution.hasOwnProperty("utm_campaign")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_campaign", attribution.utm_campaign);
           }
 
-          if (attributions.hasOwnProperty("utm_content")) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_content", attributions.utm_content);
+          if (attribution.hasOwnProperty("utm_term")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_term", attribution.utm_term);
           }
 
-          if (attributions.hasOwnProperty("utm_term")) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_term", attributions.utm_term);
+          if (visitorIds) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIds);
           }
 
           //Update iframe URL.
@@ -66,7 +68,7 @@ jQuery(function ($) {
 
 
   /**
-   * Save default attributions if we don't have params in the URL.
+   * Save default attribution if we don't have params in the URL.
    */
   $(document).on("attx.no_params", function () {
 
@@ -80,36 +82,53 @@ jQuery(function ($) {
         e.data.event.indexOf("calendly.") === 0
       ) {
 
-        let attributions = {};
+        ; (async () => {
 
-        attributions = addDefaultParams(attributions);
+          const fp = await fpPromise;
+          const fpAgent = await fp.get();
 
-        //Check if we already updated iframe URL 
-        //to prevent infinite iframe reloading.
-        if (calendlyUrlUpdated) {
-          return false;
-        }
+          let visitorId = '';
 
-        let newUrl = '';
-        let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
+          if (fpAgent.visitorId !== null) {
+            visitorId = encodeURIComponent("visitorId: " + fpAgent.visitorId)
+          }
 
-        newUrl = oldUrl;
+          let attribution = {};
+          attribution = addDefaultParams(attribution);
 
-        if (attributions.hasOwnProperty("ref")) {
-          newUrl = updateQueryStringParameter(newUrl, "utm_source", attributions.ref);
-        }
+          //Check if we already updated iframe URL 
+          //to prevent infinite iframe reloading.
+          if (calendlyUrlUpdated) {
+            return false;
+          }
 
-        if (attributions.hasOwnProperty("source")) {
-          newUrl = updateQueryStringParameter(newUrl, "utm_medium", attributions.source);
-        }
+          let newUrl = '';
+          let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
 
-        if (attributions.hasOwnProperty("path")) {
-          newUrl = updateQueryStringParameter(newUrl, "utm_campaign", attributions.path);
-        }
+          newUrl = oldUrl;
 
-        //Update iframe URL.
-        jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
-        calendlyUrlUpdated = 1;
+          if (attribution.hasOwnProperty("ref")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_source", attribution.ref);
+          }
+
+          if (attribution.hasOwnProperty("source")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_medium", attribution.source);
+          }
+
+          if (attribution.hasOwnProperty("path")) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_campaign", attribution.path);
+          }
+
+          if (visitorId) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorId);
+          }
+
+          //Update iframe URL.
+          jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
+          calendlyUrlUpdated = 1;
+
+        })();
+
       }
 
     }, false);
