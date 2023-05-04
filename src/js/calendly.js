@@ -1,10 +1,6 @@
 jQuery(function ($) {
-  let calendlyUrlUpdated = 0;
 
-  /**
-   * Wait until storage will be updated.
-   */
-  $(document).on("attx.updated", function () {
+  $(document).on("attx.updated attx.no_params", function (attxEvent, data) {
 
     window.addEventListener("message", (e) => {
 
@@ -13,26 +9,33 @@ jQuery(function ($) {
       if (
         e.origin === "https://calendly.com" &&
         e.data.event &&
-        e.data.event.indexOf("calendly.") === 0
+        e.data.event.indexOf("calendly.") === 0 &&
+        !sessionStorage.getItem("attx_calendly_updated")
       ) {
 
-        let storage = localStorage.getItem("attx");
-        if (storage) {
-          storage = JSON.parse(storage);
-          let lastStoredData = storage[storage.length - 1];
-          let attribution = lastStoredData.attribution;
-          let visitorIds = encodeURIComponent("visitorIds: " + JSON.stringify(lastStoredData.visitorIds));
+        //Check if we already updated iframe URL 
+        //to prevent infinite iframe reloading.
+        if (sessionStorage.getItem("attx_calendly_updated")) {
+          return false;
+        }
 
-          //Check if we already updated iframe URL 
-          //to prevent infinite iframe reloading.
-          if (calendlyUrlUpdated) {
-            return false;
-          }
 
-          let newUrl = '';
-          let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
 
-          newUrl = oldUrl;
+        let attribution = data.attribution;
+        let visitorIds = JSON.parse(JSON.stringify(data.visitorIds));
+
+        delete visitorIds["_ga"];
+
+        let visitorIdsStr = encodeURIComponent("visitorIds: " + JSON.stringify(visitorIds));
+
+        let newUrl = '';
+        let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
+
+        newUrl = oldUrl;
+
+
+
+        if (attxEvent.namespace === "updated") {
 
           if (attribution.hasOwnProperty("utm_source")) {
             newUrl = updateQueryStringParameter(newUrl, "utm_source", attribution.utm_source);
@@ -50,62 +53,11 @@ jQuery(function ($) {
             newUrl = updateQueryStringParameter(newUrl, "utm_term", attribution.utm_term);
           }
 
-          if (visitorIds) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIds);
+          if (visitorIdsStr) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIdsStr);
           }
 
-          //Update iframe URL.
-          jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
-          calendlyUrlUpdated = 1;
-
-        }
-
-      }
-
-    }, false);
-
-  });
-
-
-  /**
-   * Save default attribution if we don't have params in the URL.
-   */
-  $(document).on("attx.no_params", function () {
-
-    window.addEventListener("message", (e) => {
-
-      //Wait for the iframe to load
-      //to get access to iframe URL.
-      if (
-        e.origin === "https://calendly.com" &&
-        e.data.event &&
-        e.data.event.indexOf("calendly.") === 0
-      ) {
-
-        ; (async () => {
-
-          const fp = await fpPromise;
-          const fpAgent = await fp.get();
-
-          let visitorId = '';
-
-          if (fpAgent.visitorId !== null) {
-            visitorId = encodeURIComponent("visitorId: " + fpAgent.visitorId)
-          }
-
-          let attribution = {};
-          attribution = addDefaultParams(attribution);
-
-          //Check if we already updated iframe URL 
-          //to prevent infinite iframe reloading.
-          if (calendlyUrlUpdated) {
-            return false;
-          }
-
-          let newUrl = '';
-          let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
-
-          newUrl = oldUrl;
+        } else if (attxEvent.namespace === "no_params") {
 
           if (attribution.hasOwnProperty("ref")) {
             newUrl = updateQueryStringParameter(newUrl, "utm_source", attribution.ref);
@@ -119,15 +71,17 @@ jQuery(function ($) {
             newUrl = updateQueryStringParameter(newUrl, "utm_campaign", attribution.path);
           }
 
-          if (visitorId) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorId);
+          if (visitorIdsStr) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIdsStr);
           }
 
-          //Update iframe URL.
-          jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
-          calendlyUrlUpdated = 1;
+        }
 
-        })();
+
+
+        //Update iframe URL.
+        jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
+        sessionStorage.setItem("attx_calendly_updated", 1);
 
       }
 
