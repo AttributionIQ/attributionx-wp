@@ -45,6 +45,39 @@ window.addDefaultParams = function (attribution) {
 
   return attribution;
 }
+
+/**
+ * Add visitor ID.
+ * 
+ * @param {*} idName 
+ * @param {*} idValue 
+ * @param {*} lastStoredData 
+ */
+window.addVisitorId = function (idName, idValue, newData, lastStoredData) {
+
+  if (idValue !== null) {
+    if (
+      lastStoredData &&
+      lastStoredData.hasOwnProperty("visitorIds") &&
+      lastStoredData["visitorIds"].hasOwnProperty(idName) &&
+      lastStoredData.visitorIds[idName].length
+    ) {
+
+      newData["visitorIds"][idName] = lastStoredData.visitorIds[idName];
+
+      //Check if id's value is changed.
+      if (!newData.visitorIds[idName].includes(idValue)) {
+        newData["visitorIds"][idName].push(idValue);
+      }
+
+    } else {
+      newData["visitorIds"][idName] = [idValue]
+    }
+  }
+
+  return newData;
+
+}
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 // Initialize an agent at application startup.
@@ -52,12 +85,8 @@ const fpPromise = FingerprintJS.load({
   monitoring: false
 });
 jQuery(function ($) {
-  let calendlyUrlUpdated = 0;
 
-  /**
-   * Wait until storage will be updated.
-   */
-  $(document).on("attx.updated", function () {
+  $(document).on("attx.updated attx.no_params", function (attxEvent, data) {
 
     window.addEventListener("message", (e) => {
 
@@ -66,26 +95,33 @@ jQuery(function ($) {
       if (
         e.origin === "https://calendly.com" &&
         e.data.event &&
-        e.data.event.indexOf("calendly.") === 0
+        e.data.event.indexOf("calendly.") === 0 &&
+        !sessionStorage.getItem("attx_calendly_updated")
       ) {
 
-        let storage = localStorage.getItem("attx");
-        if (storage) {
-          storage = JSON.parse(storage);
-          let lastStoredData = storage[storage.length - 1];
-          let attribution = lastStoredData.attribution;
-          let visitorIds = encodeURIComponent("visitorIds: " + JSON.stringify(lastStoredData.visitorIds));
+        //Check if we already updated iframe URL 
+        //to prevent infinite iframe reloading.
+        if (sessionStorage.getItem("attx_calendly_updated")) {
+          return false;
+        }
 
-          //Check if we already updated iframe URL 
-          //to prevent infinite iframe reloading.
-          if (calendlyUrlUpdated) {
-            return false;
-          }
 
-          let newUrl = '';
-          let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
 
-          newUrl = oldUrl;
+        let attribution = data.attribution;
+        let visitorIds = JSON.parse(JSON.stringify(data.visitorIds));
+
+        delete visitorIds["_ga"];
+
+        let visitorIdsStr = encodeURIComponent("visitorIds: " + JSON.stringify(visitorIds));
+
+        let newUrl = '';
+        let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
+
+        newUrl = oldUrl;
+
+
+
+        if (attxEvent.namespace === "updated") {
 
           if (attribution.hasOwnProperty("utm_source")) {
             newUrl = updateQueryStringParameter(newUrl, "utm_source", attribution.utm_source);
@@ -103,62 +139,11 @@ jQuery(function ($) {
             newUrl = updateQueryStringParameter(newUrl, "utm_term", attribution.utm_term);
           }
 
-          if (visitorIds) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIds);
+          if (visitorIdsStr) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIdsStr);
           }
 
-          //Update iframe URL.
-          jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
-          calendlyUrlUpdated = 1;
-
-        }
-
-      }
-
-    }, false);
-
-  });
-
-
-  /**
-   * Save default attribution if we don't have params in the URL.
-   */
-  $(document).on("attx.no_params", function () {
-
-    window.addEventListener("message", (e) => {
-
-      //Wait for the iframe to load
-      //to get access to iframe URL.
-      if (
-        e.origin === "https://calendly.com" &&
-        e.data.event &&
-        e.data.event.indexOf("calendly.") === 0
-      ) {
-
-        ; (async () => {
-
-          const fp = await fpPromise;
-          const fpAgent = await fp.get();
-
-          let visitorId = '';
-
-          if (fpAgent.visitorId !== null) {
-            visitorId = encodeURIComponent("visitorId: " + fpAgent.visitorId)
-          }
-
-          let attribution = {};
-          attribution = addDefaultParams(attribution);
-
-          //Check if we already updated iframe URL 
-          //to prevent infinite iframe reloading.
-          if (calendlyUrlUpdated) {
-            return false;
-          }
-
-          let newUrl = '';
-          let oldUrl = jQuery("iframe[src*='calendly.com/']").attr("src");
-
-          newUrl = oldUrl;
+        } else if (attxEvent.namespace === "no_params") {
 
           if (attribution.hasOwnProperty("ref")) {
             newUrl = updateQueryStringParameter(newUrl, "utm_source", attribution.ref);
@@ -172,15 +157,17 @@ jQuery(function ($) {
             newUrl = updateQueryStringParameter(newUrl, "utm_campaign", attribution.path);
           }
 
-          if (visitorId) {
-            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorId);
+          if (visitorIdsStr) {
+            newUrl = updateQueryStringParameter(newUrl, "utm_content", visitorIdsStr);
           }
 
-          //Update iframe URL.
-          jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
-          calendlyUrlUpdated = 1;
+        }
 
-        })();
+
+
+        //Update iframe URL.
+        jQuery("iframe[src*='calendly.com/']").attr("src", newUrl);
+        sessionStorage.setItem("attx_calendly_updated", 1);
 
       }
 
@@ -194,7 +181,7 @@ jQuery(function ($) {
   /**
    * Add attributions to the db.
    */
-  $(document).on("attx.updated attx.no_params", function (e) {
+  $(document).on("attx.updated attx.no_params", function (e, data) {
 
     //Check if we already saved data
     //to prevent data duplication in the db
@@ -202,54 +189,9 @@ jQuery(function ($) {
       return false;
     }
 
-    let data = {
-      visitorIds: {},
-      attribution: {}
-    };
-
-    if (e.namespace === "updated") {
-      let storage = localStorage.getItem("attx");
-
-      if (storage) {
-        storage = JSON.parse(storage);
-
-        data = storage[storage.length - 1];
-      } else {
-        return false;
-      }
-
-      save(data);
-
-    } else if (e.namespace === "no_params") {
-
-      ; (async () => {
-
-        const fp = await fpPromise;
-        const fpAgent = await fp.get();
-
-        if (fpAgent.visitorId !== null) {
-          data.visitorIds = {
-            fingerprint: [fpAgent.visitorId]
-          }
-        }
-
-        data.attribution = addDefaultParams(data.attribution);
-
-        save(data);
-
-      })();
-
-    }
-
-  });
-
-  /**
-   * Send data.
-   * 
-   * @param {*} data 
-   */
-  function save(data) {
-
+    /**
+     * Send data.
+     */
     $.post(attx.ajax_url, {
       action: 'save_to_db',
       security: attx.nonce,
@@ -265,7 +207,7 @@ jQuery(function ($) {
 
     });
 
-  }
+  });
 
 })
 jQuery(function ($) {
@@ -281,44 +223,13 @@ jQuery(function ($) {
 
 })
 jQuery(function ($) {
-
-  /**
-   * To prevent duplication of data in a session.
-   */
-  if (sessionStorage.getItem("attx_updated")) {
-    $(document).trigger("attx.updated");
-    return;
-  }
-
   let data = {
     visitorIds: {},
     attribution: {}
   };
 
-  const params = ['utm_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'tduid'];
-
-  const searchParams = new URLSearchParams(window.location.search);
-  params.forEach(param => {
-    if (searchParams.has(param)) {
-      data.attribution[param] = searchParams.get(param);
-    }
-  });
-
   /**
-   * Exit if we don't have params in the URL.
-   */
-  if (!Object.keys(data.attribution).length) {
-    $(document).trigger("attx.no_params");
-    return;
-  }
-
-  /**
-   * Add default params such as time, path, ref, and source.
-   */
-  data.attribution = addDefaultParams(data.attribution);
-
-  /**
-   * Get localStorage.
+   * Get data from localStorage.
    */
   let storage = localStorage.getItem("attx");
 
@@ -328,39 +239,74 @@ jQuery(function ($) {
     storage = [];
   }
 
+  /**
+   * Get last stored data in localStorage.
+   */
+  let lastStoredData = false;
+
+  if (storage.length) {
+    lastStoredData = JSON.parse(JSON.stringify(storage[storage.length - 1]));
+  }
+
+  /**
+   * To prevent duplication of data in a session.
+   */
+  if (sessionStorage.getItem("attx_updated")) {
+
+    if (storage.length) {
+      data = storage[storage.length - 1];
+    }
+
+    $(document).trigger("attx.updated", data);
+
+    return;
+  }
+
   ; (async () => {
 
     /**
-     * Add visitor ID's.
+     * Add params from URL.
+     */
+    const params = ['utm_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'tduid'];
+    const searchParams = new URLSearchParams(window.location.search);
+    let urlHasParams = false;
+
+    params.forEach(param => {
+      if (searchParams.has(param)) {
+        urlHasParams = true;
+
+        data.attribution[param] = searchParams.get(param);
+      }
+    });
+
+    /**
+     * Add default params such as time, path, ref, and source.
+     */
+    data.attribution = addDefaultParams(data.attribution);
+
+    /**
+     * Add fingerprint ID.
      */
     const fp = await fpPromise
     const fpAgent = await fp.get()
 
-    let lastStoredData = false;
+    data = addVisitorId('fingerprint', fpAgent.visitorId, data, lastStoredData);
 
-    if (storage.length) {
-      lastStoredData = JSON.parse(JSON.stringify(storage[storage.length - 1]));
-    }
+    /**
+     * Add _ga ID.
+     */
+    var _ga = document.cookie.split(';').filter(function (cookie) {
+      return cookie.trim().startsWith('_ga=')
+    })[0].replace("_ga=", "").trim();
 
-    if (
-      lastStoredData &&
-      lastStoredData.hasOwnProperty("visitorIds") &&
-      lastStoredData["visitorIds"].hasOwnProperty("fingerprint") &&
-      lastStoredData.visitorIds.fingerprint.length
-    ) {
+    data = addVisitorId('_ga', _ga, data, lastStoredData);
 
-      data["visitorIds"]["fingerprint"] = lastStoredData.visitorIds.fingerprint;
-
-      //Check if fingerprint is changed.
-      if (
-        !lastStoredData.visitorIds.fingerprint.includes(fpAgent.visitorId) &&
-        fpAgent.visitorId !== null
-      ) {
-        data["visitorIds"]["fingerprint"].push(fpAgent.visitorId);
-      }
-
-    } else {
-      data["visitorIds"]["fingerprint"] = [fpAgent.visitorId]
+    /**
+     * Exit if we don't have params in the URL.
+     */
+    if (!urlHasParams) {
+      $(document).trigger("attx.no_params", data);
+      return;
     }
 
     /**
@@ -372,7 +318,7 @@ jQuery(function ($) {
 
     sessionStorage.setItem("attx_updated", 1);
 
-    $(document).trigger("attx.updated");
+    $(document).trigger("attx.updated", data);
 
   })();
 

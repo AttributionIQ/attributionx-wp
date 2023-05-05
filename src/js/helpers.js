@@ -45,3 +45,36 @@ window.addDefaultParams = function (attribution) {
 
   return attribution;
 }
+
+/**
+ * Add visitor ID.
+ * 
+ * @param {*} idName 
+ * @param {*} idValue 
+ * @param {*} lastStoredData 
+ */
+window.addVisitorId = function (idName, idValue, newData, lastStoredData) {
+
+  if (idValue !== null) {
+    if (
+      lastStoredData &&
+      lastStoredData.hasOwnProperty("visitorIds") &&
+      lastStoredData["visitorIds"].hasOwnProperty(idName) &&
+      lastStoredData.visitorIds[idName].length
+    ) {
+
+      newData["visitorIds"][idName] = lastStoredData.visitorIds[idName];
+
+      //Check if id's value is changed.
+      if (!newData.visitorIds[idName].includes(idValue)) {
+        newData["visitorIds"][idName].push(idValue);
+      }
+
+    } else {
+      newData["visitorIds"][idName] = [idValue]
+    }
+  }
+
+  return newData;
+
+}
