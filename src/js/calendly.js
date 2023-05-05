@@ -25,6 +25,7 @@ jQuery(function ($) {
         let visitorIds = JSON.parse(JSON.stringify(data.visitorIds));
 
         delete visitorIds["_ga"];
+        delete visitorIds["IP"];
 
         let visitorIdsStr = encodeURIComponent("visitorIds: " + JSON.stringify(visitorIds));
 
