@@ -267,16 +267,12 @@ jQuery(function ($) {
     /**
      * Add params from URL.
      */
-    const params = ['utm_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'tduid'];
     const searchParams = new URLSearchParams(window.location.search);
     let urlHasParams = false;
 
-    params.forEach(param => {
-      if (searchParams.has(param)) {
-        urlHasParams = true;
-
-        data.attribution[param] = searchParams.get(param);
-      }
+    searchParams.forEach((value, key) => {
+      urlHasParams = true;
+      data.attribution[key] = value;
     });
 
     /**
