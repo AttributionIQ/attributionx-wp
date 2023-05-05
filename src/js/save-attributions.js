@@ -8,21 +8,24 @@ jQuery(function ($) {
     return;
   }
 
-  let data = {};
+  let data = {
+    visitorIds: {},
+    attribution: {}
+  };
 
   const params = ['utm_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'tduid'];
 
   const searchParams = new URLSearchParams(window.location.search);
   params.forEach(param => {
     if (searchParams.has(param)) {
-      data[param] = searchParams.get(param);
+      data.attribution[param] = searchParams.get(param);
     }
   });
 
   /**
    * Exit if we don't have params in the URL.
    */
-  if (!Object.keys(data).length) {
+  if (!Object.keys(data.attribution).length) {
     $(document).trigger("attx.no_params");
     return;
   }
@@ -30,10 +33,10 @@ jQuery(function ($) {
   /**
    * Add default params such as time, path, ref, and source.
    */
-  data = addDefaultParams(data);
+  data.attribution = addDefaultParams(data.attribution);
 
   /**
-   * Save data to the localStorage.
+   * Get localStorage.
    */
   let storage = localStorage.getItem("attx");
 
@@ -43,12 +46,52 @@ jQuery(function ($) {
     storage = [];
   }
 
-  storage.push(data);
+  ; (async () => {
 
-  localStorage.setItem("attx", JSON.stringify(storage));
+    /**
+     * Add visitor ID's.
+     */
+    const fp = await fpPromise
+    const fpAgent = await fp.get()
 
-  sessionStorage.setItem("attx_updated", 1);
-  
-  $(document).trigger("attx.updated");
+    let lastStoredData = false;
+
+    if (storage.length) {
+      lastStoredData = JSON.parse(JSON.stringify(storage[storage.length - 1]));
+    }
+
+    if (
+      lastStoredData &&
+      lastStoredData.hasOwnProperty("visitorIds") &&
+      lastStoredData["visitorIds"].hasOwnProperty("fingerprint") &&
+      lastStoredData.visitorIds.fingerprint.length
+    ) {
+
+      data["visitorIds"]["fingerprint"] = lastStoredData.visitorIds.fingerprint;
+
+      //Check if fingerprint is changed.
+      if (
+        !lastStoredData.visitorIds.fingerprint.includes(fpAgent.visitorId) &&
+        fpAgent.visitorId !== null
+      ) {
+        data["visitorIds"]["fingerprint"].push(fpAgent.visitorId);
+      }
+
+    } else {
+      data["visitorIds"]["fingerprint"] = [fpAgent.visitorId]
+    }
+
+    /**
+     * Save data to the localStorage.
+     */
+    storage.push(data);
+
+    localStorage.setItem("attx", JSON.stringify(storage));
+
+    sessionStorage.setItem("attx_updated", 1);
+
+    $(document).trigger("attx.updated");
+
+  })();
 
 })

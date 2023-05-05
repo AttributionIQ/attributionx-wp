@@ -22,26 +22,26 @@ window.updateQueryStringParameter = function (uri, key, value) {
  * @param {*} data 
  * @returns 
  */
-window.addDefaultParams = function (data) {
+window.addDefaultParams = function (attribution) {
   const searchParams = new URLSearchParams(window.location.search);
 
-  data.time = (new Date()).toUTCString();
-  data.path = location.pathname;
-  data.ref = encodeURIComponent(document.referrer) || 'direct';
+  attribution.time = (new Date()).toUTCString();
+  attribution.path = location.pathname;
+  attribution.ref = encodeURIComponent(document.referrer) || 'direct';
 
   if (searchParams.has('gclid')) {
-    data.source = 'Google Ads';
+    attribution.source = 'Google Ads';
   } else if (searchParams.has('fbclid')) {
-    data.source = 'Meta Ads';
+    attribution.source = 'Meta Ads';
   } else if (searchParams.has('tduid')) {
-    data.source = 'Tradedoubler';
+    attribution.source = 'Tradedoubler';
   } else {
-    if (data.ref.indexOf('google') !== -1) {
-      data.source = 'Google';
-    } else if (data.ref.indexOf('instagram') !== -1) {
-      data.source = 'Instagram';
+    if (attribution.ref.indexOf('google') !== -1) {
+      attribution.source = 'Google';
+    } else if (attribution.ref.indexOf('instagram') !== -1) {
+      attribution.source = 'Instagram';
     }
   }
 
-  return data;
+  return attribution;
 }

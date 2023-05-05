@@ -8,22 +8,27 @@ var basePaths = {
 };
 
 // Defining requirements
-var gulp = require('gulp');
-var plumber = require('gulp-plumber');
-var sass = require('gulp-sass');
-var watch = require('gulp-watch');
-var rename = require('gulp-rename');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var merge2 = require('merge2');
-var imagemin = require('gulp-imagemin');
-var ignore = require('gulp-ignore');
-var rimraf = require('gulp-rimraf');
-var clone = require('gulp-clone');
-var merge = require('gulp-merge');
-var sourcemaps = require('gulp-sourcemaps');
-var del = require('del');
-var cleanCSS = require('gulp-clean-css');
+import gulp from 'gulp';
+import browserify from 'browserify';
+import source from 'vinyl-source-stream';
+import buffer from 'vinyl-buffer';
+import babel from 'gulp-babel';
+import babelify from 'babelify';
+import plumber from 'gulp-plumber';
+import sass from 'gulp-sass';
+import watch from 'gulp-watch';
+import rename from 'gulp-rename';
+import concat from 'gulp-concat';
+import uglify from 'gulp-uglify';
+import merge2 from 'merge2';
+import imagemin from 'gulp-imagemin';
+import ignore from 'gulp-ignore';
+import rimraf from 'gulp-rimraf';
+import clone from 'gulp-clone';
+import merge from 'gulp-merge';
+import sourcemaps from 'gulp-sourcemaps';
+import del from 'del';
+import cleanCSS from 'gulp-clean-css';
 
 function swallowError(self, error) {
     console.log(error.toString())
@@ -86,18 +91,41 @@ gulp.task('styles', gulp.series('sass', 'minify-css'));
 
 // Run:
 // gulp scripts.
-// Uglifies and concat all JS files into one
+// Concat all JS files into one
 gulp.task('scripts', function () {
 
     return gulp.src([
-        basePaths.dev + 'js/**/*.js'
+        basePaths.dev + 'js/helpers.js',
+        basePaths.dev + 'js/fp.js',
+        basePaths.dev + 'js/**/*.js',
+        '!' + basePaths.dev + 'js/bundle.js',
     ])
-        .pipe(concat('scripts.min.js'))
+        .pipe(concat('bundle.js'))
+        .pipe(gulp.dest(basePaths.dev + 'js'));
+
+});
+
+// Run:
+// gulp browserify
+// Browserify task that will bundle and uglifies our JS files together
+gulp.task('browserify', function () {
+    return browserify(
+        {
+            entries: basePaths.dev + 'js/bundle.js',
+            transform: [
+                babelify.configure({
+                    presets: ['@babel/preset-env'],
+                    plugins: ['@babel/plugin-transform-runtime']
+                })
+            ]
+        })
+        .bundle()
+        .pipe(source('scripts.min.js'))
+        .pipe(buffer())
         .pipe(uglify().on('error', function (e) {
             console.log(e);
         }))
         .pipe(gulp.dest(basePaths.js));
-
 });
 
 // Run:
@@ -105,7 +133,7 @@ gulp.task('scripts', function () {
 // Starts watcher. Watcher runs gulp sass task on changes
 gulp.task('watch', function () {
     gulp.watch(basePaths.dev + 'sass/**/*.scss', gulp.series(['styles', 'dist']));
-    gulp.watch(basePaths.dev + 'js/**/*.js', gulp.series(['scripts', 'dist']));
+    gulp.watch([basePaths.dev + 'js/**/*.js', '!' + basePaths.dev + 'js/bundle.js'], gulp.series(['scripts', 'browserify', 'dist']));
 
     //Inside the watch task.
     gulp.watch(basePaths.img + '**', gulp.series(['imagemin', 'dist']))

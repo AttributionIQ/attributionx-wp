@@ -1,7 +1,7 @@
 jQuery(function ($) {
 
   /**
-   * Save attributions to the db.
+   * Add attributions to the db.
    */
   $(document).on("attx.updated attx.no_params", function (e) {
 
@@ -11,8 +11,10 @@ jQuery(function ($) {
       return false;
     }
 
-
-    let attributions = {};
+    let data = {
+      visitorIds: {},
+      attribution: {}
+    };
 
     if (e.namespace === "updated") {
       let storage = localStorage.getItem("attx");
@@ -20,20 +22,48 @@ jQuery(function ($) {
       if (storage) {
         storage = JSON.parse(storage);
 
-        attributions = storage[storage.length - 1];
+        data = storage[storage.length - 1];
       } else {
         return false;
       }
+
+      save(data);
+
     } else if (e.namespace === "no_params") {
-      attributions = addDefaultParams(attributions);
+
+      ; (async () => {
+
+        const fp = await fpPromise;
+        const fpAgent = await fp.get();
+
+        if (fpAgent.visitorId !== null) {
+          data.visitorIds = {
+            fingerprint: [fpAgent.visitorId]
+          }
+        }
+
+        data.attribution = addDefaultParams(data.attribution);
+
+        save(data);
+
+      })();
+
     }
 
-    //Save
+  });
+
+  /**
+   * Send data.
+   * 
+   * @param {*} data 
+   */
+  function save(data) {
+
     $.post(attx.ajax_url, {
       action: 'save_to_db',
       security: attx.nonce,
       host: location.hostname,
-      attributions: attributions
+      data: data
     }, function (response) {
 
       let resp = JSON.parse(response);
@@ -44,6 +74,6 @@ jQuery(function ($) {
 
     });
 
-  });
+  }
 
 })

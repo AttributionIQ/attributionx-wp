@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/tiger-digital/attributionx#readme",
   "dependencies": {
-    "del": "^3.0.0",
+    "@fingerprintjs/fingerprintjs": "^3.4.1",
     "gulp-clean-css": "^3.9.1",
     "gulp-clone": "^1.1.4",
     "gulp-concat": "^2.6.1",
@@ -40,7 +40,15 @@
     "run-sequence": "^2.2.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.21.8",
+    "@babel/plugin-transform-runtime": "^7.21.4",
+    "@babel/preset-env": "^7.21.5",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "del": "^3.0.0",
     "gulp": "^4.0.2",
-    "supabase": "^1.50.11"
+    "gulp-babel": "^8.0.0",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
   }
 }
