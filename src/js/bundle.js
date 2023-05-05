@@ -1,3 +1,5 @@
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import ip from 'ip';
 /**
  * Update URL parameters.
  * 
@@ -78,8 +80,6 @@ window.addVisitorId = function (idName, idValue, newData, lastStoredData) {
   return newData;
 
 }
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
-
 // Initialize an agent at application startup.
 const fpPromise = FingerprintJS.load({
   monitoring: false
@@ -300,6 +300,11 @@ jQuery(function ($) {
     })[0].replace("_ga=", "").trim();
 
     data = addVisitorId('_ga', _ga, data, lastStoredData);
+
+    /**
+     * Add user IP.
+     */
+    data["visitorIds"]["visitorIP"] = ip.address()
 
     /**
      * Exit if we don't have params in the URL.

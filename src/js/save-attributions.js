@@ -78,6 +78,11 @@ jQuery(function ($) {
     data = addVisitorId('_ga', _ga, data, lastStoredData);
 
     /**
+     * Add user IP.
+     */
+    data["visitorIds"]["visitorIP"] = ip.address()
+
+    /**
      * Exit if we don't have params in the URL.
      */
     if (!urlHasParams) {

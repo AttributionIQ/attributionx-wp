@@ -1,6 +1,6 @@
 {
-  "type": "module",
   "name": "attributionx",
+  "type": "module",
   "version": "1.0.0",
   "description": "Discover the source of your leads. We make it easy to track the source of every lead, so you can see which campaigns and channels are truly driving results.",
   "main": "index.js",
@@ -35,6 +35,7 @@
     "gulp-sourcemaps": "2.6.2",
     "gulp-uglify": "^3.0.0",
     "gulp-watch": "^4.3.11",
+    "ip": "^1.1.8",
     "merge2": "^1.2.1",
     "popper.js": "^1.13.0",
     "run-sequence": "^2.2.1"
