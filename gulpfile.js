@@ -95,6 +95,7 @@ gulp.task('styles', gulp.series('sass', 'minify-css'));
 gulp.task('scripts', function () {
 
     return gulp.src([
+        basePaths.dev + 'js/libs.js',
         basePaths.dev + 'js/helpers.js',
         basePaths.dev + 'js/fp.js',
         basePaths.dev + 'js/**/*.js',

@@ -1,3 +1,5 @@
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import ip from 'ip';
 /**
  * Update URL parameters.
  * 
@@ -78,8 +80,6 @@ window.addVisitorId = function (idName, idValue, newData, lastStoredData) {
   return newData;
 
 }
-import FingerprintJS from '@fingerprintjs/fingerprintjs'
-
 // Initialize an agent at application startup.
 const fpPromise = FingerprintJS.load({
   monitoring: false
@@ -267,16 +267,12 @@ jQuery(function ($) {
     /**
      * Add params from URL.
      */
-    const params = ['utm_id', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid', 'tduid'];
     const searchParams = new URLSearchParams(window.location.search);
     let urlHasParams = false;
 
-    params.forEach(param => {
-      if (searchParams.has(param)) {
-        urlHasParams = true;
-
-        data.attribution[param] = searchParams.get(param);
-      }
+    searchParams.forEach((value, key) => {
+      urlHasParams = true;
+      data.attribution[key] = value;
     });
 
     /**
@@ -300,6 +296,11 @@ jQuery(function ($) {
     })[0].replace("_ga=", "").trim();
 
     data = addVisitorId('_ga', _ga, data, lastStoredData);
+
+    /**
+     * Add user IP.
+     */
+    data["visitorIds"]["visitorIP"] = ip.address()
 
     /**
      * Exit if we don't have params in the URL.
