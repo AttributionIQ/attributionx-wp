@@ -76,7 +76,7 @@ jQuery(function ($) {
     /**
      * Add user IP.
      */
-    data["visitorIds"]["visitorIP"] = ip.address()
+    data["visitorIds"]["IP"] = ip.address()
 
     /**
      * Exit if we don't have params in the URL.

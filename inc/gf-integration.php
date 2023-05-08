@@ -12,6 +12,9 @@ function attx_gform_pre_submission_handler($form)
       $storage = [];
    }
 
+   //Delete unused data.
+   unset($storage["visitorIds"]["IP"]);
+
    //Populate fields.
    if (isset($form["fields"]) && is_array($form["fields"])) {
       foreach ($form["fields"] as $field) {
