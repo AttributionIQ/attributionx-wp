@@ -4,7 +4,8 @@ var basePaths = {
     css: './assets/css/',
     img: './assets/img/',
     node: './node_modules/',
-    dev: './src/'
+    dev: './src/',
+    dist: 'C:/wamp64/www/dev-wp-common/wp-content/plugins/attributionX/'
 };
 
 // Defining requirements
@@ -142,7 +143,7 @@ gulp.task('watch', function () {
 
 // Deleting any file inside the /dist folder
 gulp.task('clean-dist', function () {
-    return del(['dist/**/*',]);
+    return del([basePaths.dist + '**/*',], { force: true });
 });
 
 // Run
@@ -165,6 +166,6 @@ gulp.task('dist', gulp.series('clean-dist', function () {
             '!./attributionX.code-workspace',
         ]
     )
-        .pipe(gulp.dest('dist/attributionX'))
+        .pipe(gulp.dest(basePaths.dist))
 }));
 

@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') || exit;
+
 /**
  * If uninstall not called from WordPress, then exit.
  */

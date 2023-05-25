@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') || exit;
+
 /**
  * Save data to the db.
  */
@@ -9,7 +11,10 @@ function attx_save_to_db()
 {
   // Verify the nonce
   if (!wp_verify_nonce($_POST['security'], '(*u3refsiId)')) {
-    wp_die('Security check failed');
+
+    echo '{"success":false, "error": {"message": "Security check failed"}}';
+
+    wp_die();
   }
 
   //Get API Key

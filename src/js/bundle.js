@@ -298,9 +298,11 @@ jQuery(function ($) {
      */
     var _ga = document.cookie.split(';').filter(function (cookie) {
       return cookie.trim().startsWith('_ga=')
-    })[0].replace("_ga=", "").trim();
+    })[0];
 
-    data = addVisitorId('_ga', _ga, data, lastStoredData);
+    if (_ga) {
+      data = addVisitorId('_ga', _ga.replace("_ga=", "").trim(), data, lastStoredData);
+    }
 
     /**
      * Add user IP.
