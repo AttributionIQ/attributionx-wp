@@ -78,3 +78,15 @@ window.addVisitorId = function (idName, idValue, newData, lastStoredData) {
   return newData;
 
 }
+
+
+/**
+ * Base64. Encode/Decode.
+ */
+function encodeBase64(str) {
+  return btoa(encodeURIComponent(str));
+}
+
+function decodeBase64(str) {
+  return decodeURIComponent(atob(str));
+}

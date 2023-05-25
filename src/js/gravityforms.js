@@ -5,7 +5,7 @@ jQuery(function ($) {
    */
   $(document).on("attx.updated", function (e) {
 
-    $("[name=gform_submit]").after("<input type='hidden' name='attx' value='" + localStorage.getItem("attx") + "' />");
+    $("[name=gform_submit]").after("<input type='hidden' name='attx' value='" + decodeBase64(localStorage.getItem("attx")) + "' />");
 
   });
 

@@ -7,7 +7,7 @@ jQuery(function ($) {
   /**
    * Get data from localStorage.
    */
-  let storage = localStorage.getItem("attx");
+  let storage = decodeBase64(localStorage.getItem("attx"));
 
   if (storage) {
     storage = JSON.parse(storage);
@@ -97,7 +97,7 @@ jQuery(function ($) {
      */
     storage.push(data);
 
-    localStorage.setItem("attx", JSON.stringify(storage));
+    localStorage.setItem("attx", encodeBase64(JSON.stringify(storage)));
 
     sessionStorage.setItem("attx_updated", 1);
 
