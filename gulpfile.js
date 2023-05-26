@@ -153,7 +153,7 @@ gulp.task('dist', gulp.series('clean-dist', function () {
     return gulp.src(
         [
             './**/*',
-            '!./.vscode',
+            '!./.vscode/**',
             '!./dist/**',
             '!./node_modules/**',
             '!./src/**',
