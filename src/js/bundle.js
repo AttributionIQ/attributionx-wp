@@ -58,23 +58,37 @@ window.addDefaultParams = function (attribution) {
 window.addVisitorId = function (idName, idValue, newData, lastStoredData) {
 
   if (idValue !== null) {
-    if (
-      lastStoredData &&
-      lastStoredData.hasOwnProperty("visitorIds") &&
-      lastStoredData["visitorIds"].hasOwnProperty(idName) &&
-      lastStoredData.visitorIds[idName].length
-    ) {
+    if (idName !== 'fingerprint') {
+      if (
+        lastStoredData &&
+        lastStoredData.hasOwnProperty("visitorIds") &&
+        lastStoredData["visitorIds"].hasOwnProperty(idName) &&
+        lastStoredData.visitorIds[idName].length
+      ) {
 
-      newData["visitorIds"][idName] = lastStoredData.visitorIds[idName];
+        newData["visitorIds"][idName] = lastStoredData.visitorIds[idName];
 
-      //Check if id's value is changed.
-      if (!newData.visitorIds[idName].includes(idValue)) {
-        newData["visitorIds"][idName].push(idValue);
+        //Check if id's value is changed.
+        if (!newData.visitorIds[idName].includes(idValue)) {
+          newData["visitorIds"][idName].push(idValue);
+        }
+
+      } else {
+        newData["visitorIds"][idName] = [idValue]
       }
-
     } else {
-      newData["visitorIds"][idName] = [idValue]
+      if (
+        lastStoredData &&
+        lastStoredData.hasOwnProperty("visitorIds") &&
+        lastStoredData["visitorIds"].hasOwnProperty(idName) &&
+        lastStoredData.visitorIds[idName] !== ''
+      ) {
+        newData["visitorIds"][idName] = lastStoredData.visitorIds[idName];
+      } else {
+        newData["visitorIds"][idName] = idValue
+      }
     }
+
   }
 
   return newData;
@@ -244,10 +258,10 @@ jQuery(function ($) {
   /**
    * Get data from localStorage.
    */
-  let storage = decodeBase64(localStorage.getItem("attx"));
+  let storage = localStorage.getItem("attx");
 
   if (storage) {
-    storage = JSON.parse(storage);
+    storage = decodeBase64(JSON.parse(storage));
   } else {
     storage = [];
   }

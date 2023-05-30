@@ -7,10 +7,10 @@ jQuery(function ($) {
   /**
    * Get data from localStorage.
    */
-  let storage = decodeBase64(localStorage.getItem("attx"));
+  let storage = localStorage.getItem("attx");
 
   if (storage) {
-    storage = JSON.parse(storage);
+    storage = decodeBase64(JSON.parse(storage));
   } else {
     storage = [];
   }
