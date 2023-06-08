@@ -30,7 +30,7 @@ function attx_gform_pre_submission_handler($form)
    //Populate fields.
    if (isset($form["fields"]) && is_array($form["fields"])) {
 
-      $attx_options = json_decode(get_option("attx_options"), true);
+      $attx_options = get_option("attx_options");
       $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
 
       foreach ($form["fields"] as $field) {
@@ -82,7 +82,7 @@ function attx_add_entry_details_metabox($meta_boxes, $entry, $form)
 
 function attx_meta_box_entry_details($args)
 {
-   $attx_options = json_decode(get_option("attx_options"), true);
+   $attx_options = get_option("attx_options");
    $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
    $form  = $args['form'];
    $entry = $args['entry'];
@@ -104,7 +104,7 @@ function attx_meta_box_entry_details($args)
 add_filter('gform_entry_field_value', 'attx_remove_entry_values', 10, 4);
 function attx_remove_entry_values($value, $field, $entry, $form)
 {
-   $attx_options = json_decode(get_option("attx_options"), true);
+   $attx_options = get_option("attx_options");
    $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
 
    if (isset($gf_attx_fields[$field['inputName']])) {

@@ -261,7 +261,7 @@ jQuery(function ($) {
   let storage = localStorage.getItem("attx");
 
   if (storage) {
-    storage = decodeBase64(JSON.parse(storage));
+    storage = JSON.parse(decodeBase64(storage));
   } else {
     storage = [];
   }

@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
  */
 function attx_add_gf_form_fields($form)
 {
-  $attx_options = json_decode(get_option("attx_options"), true);
+  $attx_options = get_option("attx_options");
   $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
 
   //Get the highest ID of form fields 
