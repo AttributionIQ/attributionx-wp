@@ -10,7 +10,7 @@ jQuery(function ($) {
   let storage = localStorage.getItem("attx");
 
   if (storage) {
-    storage = JSON.parse(storage);
+    storage = JSON.parse(decodeBase64(storage));
   } else {
     storage = [];
   }
@@ -69,9 +69,11 @@ jQuery(function ($) {
      */
     var _ga = document.cookie.split(';').filter(function (cookie) {
       return cookie.trim().startsWith('_ga=')
-    })[0].replace("_ga=", "").trim();
+    })[0];
 
-    data = addVisitorId('_ga', _ga, data, lastStoredData);
+    if (_ga) {
+      data = addVisitorId('_ga', _ga.replace("_ga=", "").trim(), data, lastStoredData);
+    }
 
     /**
      * Add user IP.
@@ -91,7 +93,7 @@ jQuery(function ($) {
      */
     storage.push(data);
 
-    localStorage.setItem("attx", JSON.stringify(storage));
+    localStorage.setItem("attx", encodeBase64(JSON.stringify(storage)));
 
     sessionStorage.setItem("attx_updated", 1);
 
