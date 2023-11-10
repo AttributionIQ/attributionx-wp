@@ -44,10 +44,8 @@ jQuery(function ($) {
      * Add params from URL.
      */
     const searchParams = new URLSearchParams(window.location.search);
-    let urlHasParams = false;
 
     searchParams.forEach((value, key) => {
-      urlHasParams = true;
       data.attribution[key] = value;
     });
 
@@ -79,14 +77,6 @@ jQuery(function ($) {
      * Add user IP.
      */
     data["visitorIds"]["IP"] = ip.address()
-
-    /**
-     * Exit if we don't have params in the URL.
-     */
-    if (!urlHasParams) {
-      $(document).trigger("attx.no_params", data);
-      return;
-    }
 
     /**
      * Save data to the localStorage.
