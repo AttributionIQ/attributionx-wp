@@ -3,11 +3,11 @@
 defined('ABSPATH') || exit;
 
 /**
- * Gravity Forms hidden fields.
+ * Hidden form fields.
  * 
  * Parameter Name => Field Label
  */
-$gf_attx_fields = [
+$attx_form_fields = [
   "attx_visitor_ids" => "attx_visitor_ids",
   "attx_utm_id" => "attx_utm_id",
   "attx_utm_source" => "attx_utm_source",
@@ -25,6 +25,6 @@ $gf_attx_fields = [
 ];
 
 $attx_options = get_option("attx_options");
-$attx_options["config"]["gf_attx_fields"] = $gf_attx_fields;
+$attx_options["config"]["attx_form_fields"] = $attx_form_fields;
 
 update_option('attx_options', $attx_options, false);

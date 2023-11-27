@@ -222,7 +222,7 @@ jQuery(function ($) {
     $.post(attx.ajax_url, {
       action: 'save_to_db',
       security: attx.nonce,
-      host: location.hostname,
+      host: location.hostname.replace("www.",""),
       data: data
     }, function (response) {
 
@@ -245,6 +245,18 @@ jQuery(function ($) {
   $(document).on("attx.updated", function (e) {
 
     $("[name=gform_submit]").after("<input type='hidden' name='attx' value='" + decodeBase64(localStorage.getItem("attx")) + "' />");
+
+  });
+
+})
+jQuery(function ($) {
+
+  /**
+   * Add the hidden field to all quForms to pass localStorage data to the server.
+   */
+  $(document).on("attx.updated", function (e) {
+
+    $("[name=quform_submit]").after("<input type='hidden' name='attx' value='" + decodeBase64(localStorage.getItem("attx")) + "' />");
 
   });
 

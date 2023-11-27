@@ -15,7 +15,8 @@ require_once "inc/helpers.php";
 require_once "inc/plugin-scripts.php";
 require_once "inc/admin/view/settings-page.php";
 require_once "inc/db.php";
-require_once "inc/gf-integration.php";
+require_once "inc/gforms.php";
+require_once "inc/quform.php";
 
 /**
  * Plugin activation tasks.
@@ -25,19 +26,28 @@ function attx_activation_function()
 {
 
   /**
-   * Run only if the Gravity Forms installed and activated.
+   * Add attx hidden fields to all created gravity forms.
    */
-  if (!is_gf_active()) {
-    return;
+  if (is_gf_active()) {
+    $active_forms = GFAPI::get_forms();
+    $inactive_forms = GFAPI::get_forms(false);
+    $forms = array_merge($active_forms, $inactive_forms);
+
+    foreach ($forms as $form) {
+      attx_add_gf_form_fields($form);
+    }
   }
 
-  //Add attx hidden fields to all created gravity forms.
-  $active_forms = GFAPI::get_forms();
-  $inactive_forms = GFAPI::get_forms(false);
-  $forms = array_merge($active_forms, $inactive_forms);
+  /**
+   * Add attx hidden fields to all created QuForms.
+   */
+  if (is_quform_active()) {
+    $repository = quform('repository');
+    $quforms = $repository->allForms();
 
-  foreach ($forms as $form) {
-    attx_add_gf_form_fields($form);
+    foreach ($quforms as $quform) {
+      attx_add_hidden_fields_to_quform($quform);
+    }
   }
 }
 
@@ -49,18 +59,27 @@ function attx_deactivation_function()
 {
 
   /**
-   * Run only if the Gravity Forms installed and activated.
+   * Delete attx hidden fields from all created gravity forms.
    */
-  if (!is_gf_active()) {
-    return;
+  if (is_gf_active()) {
+    $active_forms = GFAPI::get_forms();
+    $inactive_forms = GFAPI::get_forms(false);
+    $forms = array_merge($active_forms, $inactive_forms);
+
+    foreach ($forms as $form) {
+      attx_delete_gf_form_fields($form);
+    }
   }
 
-  //Delete attx hidden fields from all created gravity forms.
-  $active_forms = GFAPI::get_forms();
-  $inactive_forms = GFAPI::get_forms(false);
-  $forms = array_merge($active_forms, $inactive_forms);
+  /**
+   * Delete attx hidden fields from all created QuForms.
+   */
+  if (is_quform_active()) {
+    $repository = quform('repository');
+    $quforms = $repository->allForms();
 
-  foreach ($forms as $form) {
-    attx_delete_gf_form_fields($form);
+    foreach ($quforms as $quform) {
+      attx_delete_hidden_fields_quform($quform);
+    }
   }
 }
