@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Integration with the Gravity Forms plugin.
+ */
+
 defined('ABSPATH') || exit;
 
 /**
@@ -31,20 +35,20 @@ function attx_gform_pre_submission_handler($form)
    if (isset($form["fields"]) && is_array($form["fields"])) {
 
       $attx_options = get_option("attx_options");
-      $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
+      $attx_form_fields = $attx_options["config"]["attx_form_fields"];
 
       foreach ($form["fields"] as $field) {
 
          if (
-            isset($gf_attx_fields[$field["inputName"]]) &&
+            isset($attx_form_fields[$field["inputName"]]) &&
             $field["inputName"] !== "attx_visitor_ids" &&
             $field["inputName"] !== "attx_referer"
          ) {
             $slug = str_replace("attx_", "", $field["inputName"]);
             $_POST['input_' . $field["id"]] =  isset($storage["attribution"][$slug]) ? $storage["attribution"][$slug] : "";
-         } else if (isset($gf_attx_fields[$field["inputName"]]) && $field["inputName"] === "attx_visitor_ids") {
+         } else if (isset($attx_form_fields[$field["inputName"]]) && $field["inputName"] === "attx_visitor_ids") {
             $_POST['input_' . $field["id"]] =  isset($storage["visitorIds"]) ? json_encode($storage["visitorIds"]) : "";
-         } else if (isset($gf_attx_fields[$field["inputName"]]) && $field["inputName"] === "attx_referer") {
+         } else if (isset($attx_form_fields[$field["inputName"]]) && $field["inputName"] === "attx_referer") {
             $_POST['input_' . $field["id"]] =  isset($storage["attribution"]["ref"]) ? urldecode($storage["attribution"]["ref"]) : "";
          }
       }
@@ -83,14 +87,14 @@ function attx_add_entry_details_metabox($meta_boxes, $entry, $form)
 function attx_meta_box_entry_details($args)
 {
    $attx_options = get_option("attx_options");
-   $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
+   $attx_form_fields = $attx_options["config"]["attx_form_fields"];
    $form  = $args['form'];
    $entry = $args['entry'];
    $html = '';
 
    foreach ($form['fields'] as $field) {
 
-      if (isset($gf_attx_fields[$field['inputName']])) {
+      if (isset($attx_form_fields[$field['inputName']])) {
          $html = $html . "<p style='word-wrap: break-word;'><strong>" . $field['label'] . ":</strong> " . $entry[$field["id"]] . "</p>";
       }
    }
@@ -105,9 +109,9 @@ add_filter('gform_entry_field_value', 'attx_remove_entry_values', 10, 4);
 function attx_remove_entry_values($value, $field, $entry, $form)
 {
    $attx_options = get_option("attx_options");
-   $gf_attx_fields = $attx_options["config"]["gf_attx_fields"];
+   $attx_form_fields = $attx_options["config"]["attx_form_fields"];
 
-   if (isset($gf_attx_fields[$field['inputName']])) {
+   if (isset($attx_form_fields[$field['inputName']])) {
       return '';
    }
 

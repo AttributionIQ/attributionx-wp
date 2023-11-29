@@ -17,7 +17,7 @@ jQuery(function ($) {
     $.post(attx.ajax_url, {
       action: 'save_to_db',
       security: attx.nonce,
-      host: location.hostname,
+      host: location.hostname.replace("www.",""),
       data: data
     }, function (response) {
 
