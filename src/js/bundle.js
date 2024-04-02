@@ -38,9 +38,9 @@ window.addDefaultParams = function (attribution) {
   } else if (searchParams.has('tduid')) {
     attribution.source = 'Tradedoubler';
   } else {
-    if (attribution.ref.indexOf('google') !== -1) {
+    if (attribution.ref.indexOf('google.') !== -1) {
       attribution.source = 'Google';
-    } else if (attribution.ref.indexOf('instagram') !== -1) {
+    } else if (attribution.ref.indexOf('instagram.') !== -1) {
       attribution.source = 'Instagram';
     }
   }
@@ -262,6 +262,20 @@ jQuery(function ($) {
 
 })
 jQuery(function ($) {
+
+  /**
+   * Ignore the scenario where a new tab is opened from the same site
+   */
+  let currentHostname = location.hostname.replace("www.","");
+  let currentHostnameRegex = new RegExp(currentHostname);
+
+  if (currentHostnameRegex.test(document.referrer)) {
+    return false;
+  }
+
+  /**
+   * Init.
+   */
   let data = {
     visitorIds: {},
     attribution: {}

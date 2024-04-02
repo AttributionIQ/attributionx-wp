@@ -1,4 +1,18 @@
 jQuery(function ($) {
+
+  /**
+   * Ignore the scenario where a new tab is opened from the same site
+   */
+  let currentHostname = location.hostname.replace("www.","");
+  let currentHostnameRegex = new RegExp(currentHostname);
+
+  if (currentHostnameRegex.test(document.referrer)) {
+    return false;
+  }
+
+  /**
+   * Init.
+   */
   let data = {
     visitorIds: {},
     attribution: {}
