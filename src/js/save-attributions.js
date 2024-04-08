@@ -1,16 +1,6 @@
 jQuery(function ($) {
 
   /**
-   * Ignore the scenario where a new tab is opened from the same site
-   */
-  let currentHostname = location.hostname.replace("www.","");
-  let currentHostnameRegex = new RegExp(currentHostname);
-
-  if (currentHostnameRegex.test(document.referrer)) {
-    return false;
-  }
-
-  /**
    * Init.
    */
   let data = {
@@ -41,7 +31,13 @@ jQuery(function ($) {
   /**
    * To prevent duplication of data in a session.
    */
-  if (sessionStorage.getItem("attx_updated")) {
+  let currentHostname = location.hostname.replace("www.","");
+  let currentHostnameRegex = new RegExp(currentHostname);
+
+  if (
+    sessionStorage.getItem("attx_updated") ||
+    (!sessionStorage.getItem("attx_updated") && currentHostnameRegex.test(document.referrer))
+  ) {
 
     if (storage.length) {
       data = storage[storage.length - 1];
@@ -50,6 +46,13 @@ jQuery(function ($) {
     $(document).trigger("attx.updated", data);
 
     return;
+  }
+
+  /**
+   * Ignore the scenario where a new tab is opened from the same site
+   */
+  if (currentHostnameRegex.test(document.referrer)) {
+    return false;
   }
 
   ; (async () => {
