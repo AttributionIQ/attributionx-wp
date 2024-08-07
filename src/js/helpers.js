@@ -36,9 +36,9 @@ window.addDefaultParams = function (attribution) {
   } else if (searchParams.has('tduid')) {
     attribution.source = 'Tradedoubler';
   } else {
-    if (attribution.ref.indexOf('google') !== -1) {
+    if (attribution.ref.indexOf('google.') !== -1) {
       attribution.source = 'Google';
-    } else if (attribution.ref.indexOf('instagram') !== -1) {
+    } else if (attribution.ref.indexOf('instagram.') !== -1) {
       attribution.source = 'Instagram';
     }
   }

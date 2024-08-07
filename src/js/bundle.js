@@ -38,9 +38,9 @@ window.addDefaultParams = function (attribution) {
   } else if (searchParams.has('tduid')) {
     attribution.source = 'Tradedoubler';
   } else {
-    if (attribution.ref.indexOf('google') !== -1) {
+    if (attribution.ref.indexOf('google.') !== -1) {
       attribution.source = 'Google';
-    } else if (attribution.ref.indexOf('instagram') !== -1) {
+    } else if (attribution.ref.indexOf('instagram.') !== -1) {
       attribution.source = 'Instagram';
     }
   }
@@ -262,6 +262,10 @@ jQuery(function ($) {
 
 })
 jQuery(function ($) {
+
+  /**
+   * Init.
+   */
   let data = {
     visitorIds: {},
     attribution: {}
@@ -290,7 +294,13 @@ jQuery(function ($) {
   /**
    * To prevent duplication of data in a session.
    */
-  if (sessionStorage.getItem("attx_updated")) {
+  let currentHostname = location.hostname.replace("www.","");
+  let currentHostnameRegex = new RegExp(currentHostname);
+
+  if (
+    sessionStorage.getItem("attx_updated") ||
+    (!sessionStorage.getItem("attx_updated") && currentHostnameRegex.test(document.referrer))
+  ) {
 
     if (storage.length) {
       data = storage[storage.length - 1];
@@ -299,6 +309,13 @@ jQuery(function ($) {
     $(document).trigger("attx.updated", data);
 
     return;
+  }
+
+  /**
+   * Ignore the scenario where a new tab is opened from the same site
+   */
+  if (currentHostnameRegex.test(document.referrer)) {
+    return false;
   }
 
   ; (async () => {
