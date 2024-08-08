@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Attribution X
  * Description: Discover the source of your leads. We make it easy to track the source of every lead, so you can see which campaigns and channels are truly driving results.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: Tiger Digital
  * Author URI: https://tigerdigital.co.uk
  */
@@ -17,6 +17,7 @@ require_once "inc/admin/view/settings-page.php";
 require_once "inc/db.php";
 require_once "inc/gforms.php";
 require_once "inc/quform.php";
+require_once "updater/class-attx-updater.php";
 
 /**
  * Plugin activation tasks.
@@ -83,3 +84,11 @@ function attx_deactivation_function()
     }
   }
 }
+
+/**
+ * Init updater.
+ */
+function attx_init_updater(){
+  $attx_updater = new Attx_Updater();
+}
+add_action( 'plugins_loaded', "attx_init_updater");
