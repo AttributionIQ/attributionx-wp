@@ -1,0 +1,24 @@
+{
+    "name": "Attribution IQ",
+    "slug": "attributionIQ",
+    "author": "<a href='https://attributioniq.io'>Attribution IQ</a>",
+    "author_profile" : "",
+    "donate_link" : "",
+    "version": "1.5.0",
+    "download_url": "",
+    "requires": "5.6",
+    "tested": "6.5.5",
+    "requires_php": "7.0.0",
+    "added": "2023-02-15 12:53:00",
+    "last_updated": "2024-07-16 10:00:00",
+    "homepage": "https://attributioniq.io",
+    "sections": {
+        "description": "Lead Tracking Software to Eliminate Wasted Ad Spend.",
+        "installation": "Click the activate button and that's it.",
+        "changelog": "<h4>v1.5.0 released on Aug 08 2024</h4><ul><li>Improvement: Add auto-updating</li></ul>"
+    },
+    "banners": {
+        "low": "https://myxznsjxiabywzqxedih.supabase.co/storage/v1/object/sign/attribution/wp-assets/wp_banner_0.5.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdHRyaWJ1dGlvbi93cC1hc3NldHMvd3BfYmFubmVyXzAuNS5wbmciLCJpYXQiOjE3MjE2NTUzMTQsImV4cCI6MjAzNzAxNTMxNH0.BStYrvRp9Db9Mu8o1bdcOAstuPUXwzZw7E5sL6LxnFo&t=2024-07-22T13%3A35%3A14.599Z",
+        "high": "https://myxznsjxiabywzqxedih.supabase.co/storage/v1/object/sign/attribution/wp-assets/wp_banner.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdHRyaWJ1dGlvbi93cC1hc3NldHMvd3BfYmFubmVyLnBuZyIsImlhdCI6MTcyMTY1NTI4MiwiZXhwIjoyMDM3MDE1MjgyfQ.nvy5CM9c4Hez1YwQCnUDIzIwJKCKJt8-qPyuxnTPy7w&t=2024-07-22T13%3A34%3A42.366Z"
+    }
+}
